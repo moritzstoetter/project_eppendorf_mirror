@@ -17,8 +17,8 @@ Make sure the following environment variables are set:
 
 ```bash
 export IDF_TARGET=esp32c3
-export IDF_PATH="<>"
-export IDF_TOOLS_PATH="<>"
+export IDF_PATH="<path_to_idf_repo>"
+export IDF_TOOLS_PATH="<path_to_idf_tools>"
 export IDF_CCACHE_ENABLE=1
 
 ```
