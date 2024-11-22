@@ -1,0 +1,21 @@
+# os
+*.swp
+*~
+**/.DS_Store
+
+# editors
+.vscode
+.idea
+
+# build
+build
+.build
+_build
+
+# cmake
+CMakeUserPresets.json
+.cmake
+**/CMakeFiles
+
+# vcpkg
+vcpkg_installed
