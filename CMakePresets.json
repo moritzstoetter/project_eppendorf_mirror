@@ -27,15 +27,7 @@
     {
       "name": "_esp32",
       "hidden": true,
-      "toolchainFile": "$env{IDF_PATH}/tools/cmake/toolchain-esp32c3.cmake",
-      "cacheVariables": {
-        "BUILD_MODE": "TARGET",
-        "METL_TESTS": "OFF",
-        "METL_OS": "freertos",
-        "TARGET": "$env{IDF_TARGET}",
-        "TARGET_ARCH": "RISCV32",
-        "TARGET_TRIPLET": "riscv32-esp-elf"
-      }
+      "toolchainFile": "$env{IDF_PATH}/tools/cmake/toolchain-esp32c3.cmake"
     },
     {
       "name": "debug",

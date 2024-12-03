@@ -12,10 +12,14 @@ build
 .build
 _build
 
-# cmake
+# build folder
 CMakeUserPresets.json
 .cmake
 **/CMakeFiles
 
 # vcpkg
 vcpkg_installed
+
+# espressif
+sdkconfig*
+!sdkconfig.defaults

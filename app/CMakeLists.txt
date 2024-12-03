@@ -23,15 +23,8 @@ target_include_directories(${APP}
         ${CMAKE_SOURCE_DIR}
 )
 
-#target_include_directories(metl
-#        INTERFACE
-#        $ENV{IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/include/freertos
-#)
-
 target_link_libraries(${APP}
         PRIVATE
-        #        metl
-
         idf::driver
         idf::freertos
 )
