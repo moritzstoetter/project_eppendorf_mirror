@@ -4,8 +4,8 @@ macro(setup_build_env COMPONENTS)
     include($ENV{IDF_PATH}/tools/cmake/idf.cmake)
 
     set(valid_targets "esp32" "esp32s2" "esp32s3" "esp32c3" "esp32c2" "esp32c6" "esp32h2" "esp32p4")
-    if ($CACHE{TARGET} IN_LIST valid_targets)
-        idf_build_process($CACHE{TARGET}
+    if ($ENV{IDF_TARGET} IN_LIST valid_targets)
+        idf_build_process($ENV{IDF_TARGET}
                 COMPONENTS ${COMPONENTS}
                 SDKCONFIG ${CMAKE_SOURCE_DIR}/sdkconfig
                 BUILD_DIR ${CMAKE_BINARY_DIR}
