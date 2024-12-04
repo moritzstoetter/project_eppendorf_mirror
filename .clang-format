@@ -1,45 +1,79 @@
-Language: Cpp
-BasedOnStyle: LLVM
-ColumnLimit: 0
-IndentWidth: 4
-
-Standard: c++20
-
-AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments: Consecutive
-AlignConsecutiveBitFields: Consecutive
-AlignOperands: AlignAfterOperator
-AlignTrailingComments: true
-AllowAllConstructorInitializersOnNextLine: true
-AllowAllParametersOfDeclarationOnNextLine: true
-#BraceWrapping:
-#  AfterControlStatement: true
-#  BeforeCatch: true
-BreakBeforeBraces: Attach
-BreakConstructorInitializers: BeforeComma
-BreakBeforeBinaryOperators: NonAssignment
-
-# functions
-AllowShortFunctionsOnASingleLine: All
-AllowAllArgumentsOnNextLine: true
-BinPackArguments: false
-BinPackParameters: false
-
-AllowShortBlocksOnASingleLine: Empty
-
-# while, for
-AllowShortLoopsOnASingleLine: true
-
-# if-else
-AllowShortIfStatementsOnASingleLine: AllIfsAndElse
-BreakBeforeTernaryOperators: true
-
-# switch
-AllowShortCaseLabelsOnASingleLine: true
-AlignConsecutiveShortCaseStatements:
-  Enabled: true
-
-# templates
-BreakBeforeConceptDeclarations: Allowed
-# BreakTemplateDeclarations: MultiLine # clang format 19
-RequiresClausePosition: SingleLine
+  AccessModifierOffset: -4
+  AlignAfterOpenBracket: Align
+  AlignConsecutiveAssignments: None
+  AlignConsecutiveDeclarations: None
+  AlignEscapedNewlines: Left
+  AlignOperands: true
+  AlignTrailingComments: true
+  AllowAllArgumentsOnNextLine: true
+  AllowAllConstructorInitializersOnNextLine: true
+  AllowAllParametersOfDeclarationOnNextLine: false
+  AllowShortBlocksOnASingleLine: Never
+  AllowShortCaseLabelsOnASingleLine: false
+  AllowShortFunctionsOnASingleLine: Empty
+  AllowShortIfStatementsOnASingleLine: Never
+  AllowShortLambdasOnASingleLine: Empty
+  AllowShortLoopsOnASingleLine: false
+  AlwaysBreakAfterReturnType: None
+  AlwaysBreakBeforeMultilineStrings: false
+  AlwaysBreakTemplateDeclarations: Yes
+  BinPackArguments: false
+  BinPackParameters: false
+  BreakBeforeBinaryOperators: None
+  BreakBeforeBraces: Attach
+  BreakBeforeTernaryOperators: false
+  BreakConstructorInitializers: AfterColon
+  BreakInheritanceList: AfterColon
+  BreakStringLiterals: true
+  # CommentPragmas:  '^\\.+' # This will allow doxygen file comment starting with /**
+  ColumnLimit: 120
+  CompactNamespaces: false
+  ConstructorInitializerAllOnOneLineOrOnePerLine: true
+  ConstructorInitializerIndentWidth: 2
+  ContinuationIndentWidth: 2
+  Cpp11BracedListStyle: true
+  DerivePointerAlignment: false
+  FixNamespaceComments: true
+  IncludeBlocks: Regroup
+  IndentCaseLabels: false
+  IndentPPDirectives: None
+  IndentRequires: true
+  IndentWidth: 2
+  IndentWrappedFunctionNames: true
+  KeepEmptyLinesAtTheStartOfBlocks: false
+  Language: Cpp
+  MaxEmptyLinesToKeep: 1
+  NamespaceIndentation: None
+  PenaltyBreakAssignment: 0
+  PointerAlignment: Left
+  # RawStringFormats
+  ReflowComments: true
+  SortIncludes: Never
+  SortUsingDeclarations: true
+  SpaceAfterCStyleCast: false
+  SpaceAfterLogicalNot: false
+  SpaceAfterTemplateKeyword: false
+  SpaceBeforeAssignmentOperators: true
+  SpaceBeforeCpp11BracedList: false
+  SpaceBeforeCtorInitializerColon: true
+  SpaceBeforeInheritanceColon: true
+  SpaceBeforeParens: ControlStatements
+  SpaceBeforeRangeBasedForLoopColon: true
+  SpaceBeforeSquareBrackets: false
+  SpacesInConditionalStatement: false
+  SpaceInEmptyBlock: false
+  SpaceInEmptyParentheses: false
+  SpacesBeforeTrailingComments: 4
+  SpacesInAngles: false
+  SpacesInCStyleCastParentheses: false
+  SpacesInContainerLiterals: false
+  SpacesInParentheses: false
+  SpacesInSquareBrackets: false
+  Standard: Latest
+  TabWidth: 2
+  UseCRLF: false
+  UseTab: Never
+  InsertNewlineAtEOF: true
+  LineEnding: LF
+  QualifierAlignment: Custom
+  QualifierOrder: ['friend', 'inline', 'constexpr', 'const', 'volatile', 'type' ]
