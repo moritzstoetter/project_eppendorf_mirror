@@ -1,6 +1,10 @@
 #include <edf/fail/failure_handler.hpp>
 #include <edf/hw/mcu.hpp>
 
+#include <optional>
+#include <string>
+#include <string_view>
+
 #include "esp_system.h"
 
 namespace edf::hw::mcu {
@@ -14,33 +18,29 @@ auto reset() noexcept -> void {
     esp_restart();
 }
 
-auto get_hardware_reset_reason() noexcept -> std::optional <std::string_view> {
-    static std::string str;
-
+auto get_hardware_reset_reason() noexcept -> std::optional<std::string_view> {
     switch (esp_reset_reason()) {
-        case ESP_RST_UNKNOWN:       str = "ESP_RST_UNKNOWN"; break;
-        case ESP_RST_POWERON:       str = "ESP_RST_POWERON"; break;
-        case ESP_RST_EXT:           str = "ESP_RST_EXT"; break;
-        case ESP_RST_SW:            str = "ESP_RST_SW"; break;
-        case ESP_RST_PANIC:         str = "ESP_RST_PANIC"; break;
-        case ESP_RST_INT_WDT:       str = "ESP_RST_INT_WDT"; break;
-        case ESP_RST_TASK_WDT:      str = "ESP_RST_TASK_WDT"; break;
-        case ESP_RST_WDT:           str = "ESP_RST_WDT"; break;
-        case ESP_RST_DEEPSLEEP:     str = "ESP_RST_DEEPSLEEP"; break;
-        case ESP_RST_BROWNOUT:      str = "ESP_RST_BROWNOUT"; break;
-        case ESP_RST_SDIO:          str = "ESP_RST_SDIO"; break;
-        case ESP_RST_USB:           str = "ESP_RST_USB"; break;
-        case ESP_RST_JTAG:          str = "ESP_RST_JTAG"; break;
-        case ESP_RST_EFUSE:         str = "ESP_RST_EFUSE"; break;
-        case ESP_RST_PWR_GLITCH:    str = "ESP_RST_PWR_GLITCH"; break;
-        case ESP_RST_CPU_LOCKUP:    str = "ESP_RST_CPU_LOCKUP"; break;
-        default:                    return std::nullopt;
+    case ESP_RST_UNKNOWN:    return {"ESP_RST_UNKNOWN"};
+    case ESP_RST_POWERON:    return {"ESP_RST_POWERON"};
+    case ESP_RST_EXT:        return {"ESP_RST_EXT"};
+    case ESP_RST_SW:         return {"ESP_RST_SW"};
+    case ESP_RST_PANIC:      return {"ESP_RST_PANIC"};
+    case ESP_RST_INT_WDT:    return {"ESP_RST_INT_WDT"};
+    case ESP_RST_TASK_WDT:   return {"ESP_RST_TASK_WDT"};
+    case ESP_RST_WDT:        return {"ESP_RST_WDT"};
+    case ESP_RST_DEEPSLEEP:  return {"ESP_RST_DEEPSLEEP"};
+    case ESP_RST_BROWNOUT:   return {"ESP_RST_BROWNOUT"};
+    case ESP_RST_SDIO:       return {"ESP_RST_SDIO"};
+    case ESP_RST_USB:        return {"ESP_RST_USB"};
+    case ESP_RST_JTAG:       return {"ESP_RST_JTAG"};
+    case ESP_RST_EFUSE:      return {"ESP_RST_EFUSE"};
+    case ESP_RST_PWR_GLITCH: return {"ESP_RST_PWR_GLITCH"};
+    case ESP_RST_CPU_LOCKUP: return {"ESP_RST_CPU_LOCKUP"};
+    default:                 return std::nullopt;
     }
-
-    return std::string_view{str};
 }
 
-}
+} // namespace edf::hw::mcu
 
 namespace edf::fail {
 
@@ -48,4 +48,4 @@ auto get_failure_handler() -> failure_handler & {
     std::terminate();
 }
 
-}
+} // namespace edf::fail

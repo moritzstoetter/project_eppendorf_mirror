@@ -15,7 +15,6 @@ add_executable(${APP}
 
 target_sources(${APP}
         PRIVATE
-        app_main.cpp
 )
 
 target_include_directories(${APP}
