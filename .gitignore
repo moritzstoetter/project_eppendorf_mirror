@@ -1,0 +1,25 @@
+# os
+*.swp
+*~
+**/.DS_Store
+
+# editors
+.vscode
+.idea
+
+# build
+build
+.build
+_build
+
+# build folder
+CMakeUserPresets.json
+.cmake
+**/CMakeFiles
+
+# vcpkg
+vcpkg_installed
+
+# espressif
+sdkconfig*
+!sdkconfig.defaults
