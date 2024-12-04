@@ -1,0 +1,49 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "_general",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/_build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_MODULE_PATH": "${sourceDir}/cmake",
+        "FETCHCONTENT_BASE_DIR": "${sourceDir}/_build/${presetName}/_deps/"
+      },
+      "architecture": {
+        "value": "unspecified",
+        "strategy": "external"
+      }
+    },
+    {
+      "name": "_debug",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_FLAGS": "-g -O3",
+        "CMAKE_CXX_FLAGS": "-g -O3"
+      }
+    },
+    {
+      "name": "_esp32",
+      "hidden": true,
+      "toolchainFile": "$env{IDF_PATH}/tools/cmake/toolchain-esp32c3.cmake"
+    },
+    {
+      "name": "debug",
+      "displayName": "debug",
+      "inherits": [
+        "_general",
+        "_debug",
+        "_esp32"
+      ]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    }
+  ]
+}
+

@@ -1,38 +1,29 @@
 # Build Instructions
 
-## In Container
+## Container
 
-Build the container with attached `Dockerfile`, then in it in folder `project` do:
+Check out the container configuration from [https://gitlab.ep-dev.net/polaris/container-images/polaris-esp-idf-ci-image.git](https://gitlab.ep-dev.net/polaris/container-images/polaris-esp-idf-ci-image.git), then build it with:
 
-```bash
-cmake --preset debug
-cmake --build --preset debug
+```bash 
+podman build -t polaris_edf_idf_ci --build-arg BASE_IMAGE=docker.io/espressif/idf:release-v5.3 .
 ```
 
-## On the Host 
+## Firmware
 
-Checkout the ESP-IDF and isntall the tools ([instructions](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/linux-macos-setup.html)).
+Run the container by doing `./run_in_docker.sh` from the repos root. Then connect to via ssh with `ssh user@localhost -p2222`, finally in the container do:
 
-Make sure the following environment variables are set: 
+### Setup conan in container
 
+```bash  
+conan user -r skynet -p
+```
 ```bash
-export IDF_TARGET=esp32c3
-export IDF_PATH="<>"
-export IDF_TOOLS_PATH="<>"
-export IDF_CCACHE_ENABLE=1
-
+conan user -r skynet-dev -p
+```
+```bash
+conan config set storage.path="${CONAN_STORAGE_PATH}"
 ```
 
-Then bootstrap the development environment:
+### Build 
 
-```bash
-$IDF_PATH/install.sh $IDF_TARGET
-source $IDF_PATH/export.sh
-```
-
-Finally in `project` do:
-
-```bash
-cmake --preset debug
-cmake --build --preset debug
-```
+Run `./do/sh`
