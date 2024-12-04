@@ -2,7 +2,6 @@
 #include <edf/hw/mcu.hpp>
 
 #include <optional>
-#include <string>
 #include <string_view>
 
 #include "esp_system.h"
