@@ -11,8 +11,6 @@ set(APP ${PROJECT_NAME}_app)
 
 add_executable(${APP}
         app_main.cpp
-        messaging/messenger.hpp
-        messaging/decoder.hpp
 )
 
 target_sources(${APP}
@@ -34,4 +32,3 @@ target_link_libraries(${APP}
 )
 
 build_executable(${APP})
-

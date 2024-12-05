@@ -14,7 +14,7 @@ _build
 
 # build folder
 CMakeUserPresets.json
-.cmakezCZXC
+.cmake
 **/CMakeFiles
 
 # vcpkg
