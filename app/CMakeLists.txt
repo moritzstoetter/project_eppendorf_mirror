@@ -11,7 +11,8 @@ set(APP ${PROJECT_NAME}_app)
 
 add_executable(${APP}
         app_main.cpp
-        log_config.hpp
+        messaging/messenger.hpp
+        messaging/decoder.hpp
 )
 
 target_sources(${APP}
