@@ -10,8 +10,7 @@
 #include "bsp/time.hpp"
 #include "bsp/uart.hpp"
 
-struct messenger_t {
-  private:
+class messenger_t {
   using msg_uart = uart<UART_NUM_1,
                         esp_uart_config_t{.config{
                                             .baud_rate = 115'200,
@@ -49,8 +48,9 @@ struct messenger_t {
         return decode<messages_t>(raw);
       });
 
-      if (msg.has_value())
+      if (msg.has_value()) {
         out_queue_.push(*msg);
+      }
     }
   }
 

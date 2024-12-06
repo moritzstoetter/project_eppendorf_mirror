@@ -6,8 +6,7 @@
 
 #include "bsp/uart.hpp"
 
-struct esp_uart_log_sink final : polaris::core::i_logging_sink {
-  private:
+class esp_uart_log_sink final : polaris::core::i_logging_sink {
   using log_uart = uart<UART_NUM_0,
                         esp_uart_config_t{.config{
                                             .baud_rate = 115'200,
@@ -27,7 +26,7 @@ struct esp_uart_log_sink final : polaris::core::i_logging_sink {
   esp_uart_log_sink() {
     log_uart::init();
 
-    auto& logger = reinterpret_cast<polaris::core::developer_logger&>(polaris::core::get_developer_logger());
+    auto& logger = static_cast<polaris::core::developer_logger&>(polaris::core::get_developer_logger());
     logger.add_logging_sink(*this);
     // lifetime !
   }

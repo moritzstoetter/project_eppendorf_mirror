@@ -37,7 +37,6 @@ struct uart {
   [[nodiscard]] static std::optional<uint8_t>
     rx(const std::chrono::milliseconds& timeout = os::forever) {
     uint8_t buf;
-    const auto wait_ticks = std::chrono::duration_cast<os::ticks>(timeout).count();
-    return uart_read_bytes(id, &buf, 1, wait_ticks) == 1 ? std::optional{buf} : std::nullopt;
+    return uart_read_bytes(id, &buf, 1, os::to_ticks(timeout)) == 1 ? std::optional{buf} : std::nullopt;
   }
 };
