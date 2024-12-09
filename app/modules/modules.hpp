@@ -32,7 +32,7 @@ using request_t = detail::concat_t<sys::request_t, wifi::request_t>;
 
 template<>
 struct msg::decoder<request_t> {
-  auto operator()(uint8_t byte) const -> std::optional<request_t> {
+  [[nodiscard]] constexpr auto operator()(uint8_t byte) const noexcept -> std::optional<request_t> {
     switch (byte) {
     case 'q':
       return sys::requests::dummy{};

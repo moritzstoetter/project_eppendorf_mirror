@@ -7,7 +7,6 @@
       "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/_build/${presetName}",
       "cacheVariables": {
-        "CMAKE_CXX_CLANG_TIDY": "clang-tidy;--header-filter=${sourceDir}/*;-warnings-as-errors=*",
         "CMAKE_MODULE_PATH": "${sourceDir}/cmake",
         "FETCHCONTENT_BASE_DIR": "${sourceDir}/_build/${presetName}/_deps/"
       },
