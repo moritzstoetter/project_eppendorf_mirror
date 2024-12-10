@@ -1,3 +1,12 @@
+/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*
+ *  @date 2024-12-10 (created)
+ *  @author Moritz Stötter (moritz@modernembedded.tech)
+ *  @copyright (c) Eppendorf SE 2024 - Polaris Project
+ *  @brief Example of a module that received requests.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 #pragma once
 
 #include "app/messaging/dispatch.hpp"

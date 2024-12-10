@@ -1,3 +1,12 @@
+/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*
+ *  @date 2024-12-10 (created)
+ *  @author Moritz Stötter (moritz@modernembedded.tech)
+ *  @copyright (c) Eppendorf SE 2024 - Polaris Project
+ *  @brief app_main.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 #include "app/log_config.hpp"
 #include "app/messaging/messenger.hpp"
 #include "app/modules/modules.hpp"

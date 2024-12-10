@@ -1,3 +1,12 @@
+/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*
+ *  @date 2024-12-10 (created)
+ *  @author Moritz Stötter (moritz@modernembedded.tech)
+ *  @copyright (c) Eppendorf SE 2024 - Polaris Project
+ *  @brief Conversion helpers for time in ticks.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 #pragma once
 
 #include <chrono>
