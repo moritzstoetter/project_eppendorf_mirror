@@ -17,6 +17,9 @@ struct connect_to_ssid {
   std::string_view ssid;
   std::string_view pass;
 };
+struct set_hostname {
+  std::string_view hostname;
+};
 }    // namespace requests
 
 // clang-format off
@@ -25,50 +28,82 @@ using request_t =
     requests::start_service,
     requests::stop_service,
     requests::start_scan,
-    requests::connect_to_ssid
+    requests::connect_to_ssid,
+    requests::set_hostname
 >;
 // clang-format on
 
 struct mod {
-  enum struct state { uninitialized, off, on };
+  enum struct state { uninitialized, off, on, connected, got_ip };
 
   void start() {
-    if (state_ == state::uninitialized) {
-      init_();
+    if (state_ != state::uninitialized) {
+      deinit();
     }
+    init();
+
+    ESP_ERROR_CHECK(esp_event_handler_instance_register(
+      WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, this, &wifi_event_handler_instance_));
+    ESP_ERROR_CHECK(esp_event_handler_instance_register(
+      IP_EVENT, ESP_EVENT_ANY_ID, &ip_event_handler, this, &ip_event_handler_instance_));
+
     ESP_ERROR_CHECK(esp_wifi_start());
     state_ = state::on;
   }
 
   void stop() {
     ESP_ERROR_CHECK(esp_wifi_stop());
+    ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT, ESP_EVENT_ANY_ID, &ip_event_handler_instance_));
+    ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler_instance_));
     state_ = state::off;
+  }
+
+  void set_hostname(std::string_view hostname) const {
+    std::array<char, 32> buf{};
+    const auto out = std::copy_n(hostname.begin(), std::clamp(hostname.size(), 0UZ, 31UZ), buf.begin());
+    *out = '\0';
+    ESP_ERROR_CHECK(esp_netif_set_hostname(netif_, buf.data()));
+  }
+
+  void connect(std::string_view ssid, std::string_view pass) const {
+    auto conf = ::wifi_config_t{};
+    std::ranges::copy(ssid, std::begin(conf.sta.ssid));
+    std::ranges::copy(pass, std::begin(conf.sta.password));
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &conf));
+    ESP_ERROR_CHECK(esp_wifi_connect());
   }
 
   private:
   state state_ = state::uninitialized;
+  esp_netif_t* netif_ = nullptr;
+  esp_event_handler_instance_t ip_event_handler_instance_ = nullptr;
+  esp_event_handler_instance_t wifi_event_handler_instance_ = nullptr;
 
-  void init_() {
+  void init() {
     ESP_ERROR_CHECK(esp_netif_init());
-    esp_netif_inherent_config_t esp_netif_config = ESP_NETIF_INHERENT_DEFAULT_WIFI_STA();
-    esp_netif_config.if_desc = "netif";
-    esp_netif_config.route_prio = 128;
-    assert(esp_netif_create_wifi(WIFI_IF_STA, &esp_netif_config));
+    netif_ = esp_netif_create_default_wifi_sta();
+    assert(netif_);
 
     const ::wifi_init_config_t init_cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&init_cfg));
 
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
 
-    ESP_ERROR_CHECK(esp_wifi_set_default_wifi_sta_handlers());
-    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, nullptr));
-    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &ip_event_handler, nullptr));
-
     state_ = state::off;
   }
 
-  static auto ip_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data) -> void;
-  static auto wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data) -> void;
+  void deinit() {
+    stop();
+
+    esp_wifi_deinit();
+    esp_netif_deinit();
+    esp_netif_destroy(netif_);
+    netif_ = nullptr;
+    state_ = state::uninitialized;
+  }
+
+  static void ip_event_handler(void* self, esp_event_base_t event_base, int32_t event_id, void* event_data);
+  static void wifi_event_handler(void* self, esp_event_base_t event_base, int32_t event_id, void* event_data);
 };
 
 constexpr auto make_handler(mod& wifi) {
@@ -86,15 +121,15 @@ constexpr auto make_handler(mod& wifi) {
                         LOG_DEBUG("[WIFI] start scan");
                         constexpr auto conf = ::wifi_scan_config_t{};
                         constexpr auto block = false;
-
-                        esp_wifi_scan_start(&conf, block);
+                        ESP_ERROR_CHECK(esp_wifi_scan_start(&conf, block));
                       }),
-                      msg::callback<connect_to_ssid>([](const auto& req) {
-                        auto conf = ::wifi_config_t{};
-                        std::ranges::copy(req.ssid, conf.sta.ssid);
-                        std::ranges::copy(req.pass, conf.sta.password);
-                        ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &conf));
-                        ESP_ERROR_CHECK(esp_wifi_connect());
+                      msg::callback<connect_to_ssid>([&](const auto& req) {
+                        LOG_DEBUG("[WIFI] connect to ssid {}", req.ssid);
+                        wifi.connect(req.ssid, req.pass);
+                      }),
+                      msg::callback<set_hostname>([&](const auto& req) {
+                        LOG_DEBUG("[WIFI] set hostname {}", req.hostname);
+                        wifi.set_hostname(req.hostname);
                       })};
 }
 }    // namespace wifi

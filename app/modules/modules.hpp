@@ -3,11 +3,13 @@
 #include <optional>
 #include <variant>
 
+// todo: dont commit
 #include "app/modules/sys/sys.hpp"
 #include "app/modules/wifi/wifi.hpp"
 
-#define SSID "<your-ssid>"sv
-#define PASS "<your-pass>"sv
+#define SSID "<put-your-data-here>"
+#define PASS "<put-your-data-here>"
+#define HOSTNAME "<put-your-data-here>"
 
 namespace detail {
 /**
@@ -47,8 +49,10 @@ struct msg::decoder<request_t> {
       return wifi::requests::stop_service{};
     case 'd':
       return wifi::requests::start_scan{};
-    case 'e':
+    case 'f':
       return wifi::requests::connect_to_ssid{SSID, PASS};
+    case 'g':
+      return wifi::requests::set_hostname{HOSTNAME};
     default:
       return std::nullopt;
     }

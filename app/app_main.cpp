@@ -21,7 +21,7 @@ extern "C" [[noreturn]] void app_main() {
   } modules;
 
   // clang-format off
-  constexpr static auto msg_handler =
+  constexpr static auto MsgHandler =
     msg::handler{
       sys::make_handler(modules.sys),
       wifi::make_handler(modules.wifi),
@@ -32,7 +32,11 @@ extern "C" [[noreturn]] void app_main() {
 
   while (true) {
     if (auto msg = messenger.receive()) {
-      auto const dispatched = std::visit([&](auto &&m) { return msg_handler(m); }, *msg);
+      const auto dispatched = std::visit(
+        [&](auto&& m) {
+          return MsgHandler(m);
+        },
+        *msg);
       if (not dispatched) {
         LOG_WARNING("Received unhandled message");
       }

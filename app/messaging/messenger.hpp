@@ -30,7 +30,7 @@ class messenger_t {
   public:
   messenger_t() :
     thread_{{"uart_msg_thd", edf::os::LowestTaskPriority}, [this] {
-              worker_();
+              worker();
             }} {
     if (not msg_uart::init()) {
       LOG_ERROR("Failed to init uart");
@@ -43,7 +43,7 @@ class messenger_t {
   }
 
   private:
-  [[noreturn]] void worker_() {
+  [[noreturn]] void worker() {
     while (true) {
       const auto msg = msg_uart::rx().and_then([](auto raw) {
         return msg::decode<T>(raw);
