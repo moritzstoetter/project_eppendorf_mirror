@@ -3,7 +3,6 @@
 #include <optional>
 #include <variant>
 
-// todo: dont commit
 #include "app/modules/sys/sys.hpp"
 #include "app/modules/wifi/wifi.hpp"
 
