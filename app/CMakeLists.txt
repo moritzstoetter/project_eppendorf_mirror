@@ -15,6 +15,7 @@ add_executable(${APP}
 
 target_sources(${APP}
         PRIVATE
+        edf_stubs.cpp
 )
 
 target_include_directories(${APP}
@@ -26,11 +27,8 @@ target_link_libraries(${APP}
         PRIVATE
         idf::driver
         idf::freertos
-)
 
-target_compile_options(${APP}
-        PRIVATE
-        -fno-exceptions
+        ${CONAN_LIBS}
 )
 
 build_executable(${APP})

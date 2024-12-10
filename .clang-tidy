@@ -1,0 +1,127 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#  Clang-tidy Main Configuration File
+#  ==================================
+#  This clang-tidy configuration is based on the file used by the EDF (derived 2021-11-22).
+#  To fit the specific needs of the Polaris project the configuration has been adapted and extended.
+#  Note: All lines containing POLARIS comment have different settings than in the EDF.
+#  Link and hash of original EDF file: https://scm-ih-02.eppendorf.de/edf/edf/-/blob/9a2dcf674c42e6f9e211a2c4a966f5f2363400d9/.clang-tidy
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+Checks: >
+  bugprone-*,
+  clang-analyzer-*,
+  concurrency-*,
+  cppcoreguidelines-*,
+  misc-*,
+  modernize-*,
+  performance-*,
+  portability-*,
+  readability-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-reserved-identifier,
+  -clang-analyzer-osx*,
+  -clang-analyzer-llvm*,
+  -clang-analyzer-optin*,
+  -clang-analyzer-unix*,
+  -clang-analyzer-valist*,
+  -clang-diagnostic-deprecated-volatile,
+  -clang-diagnostic-ignored-optimization-argument,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -modernize-use-trailing-return-type,
+  -modernize-avoid-c-arrays,
+  -modernize-use-default-member-init,
+  -cppcoreguidelines-use-default-member-init,
+  -readability-identifier-length,
+  -readability-magic-numbers,
+  -readability-function-cognitive-complexity,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
+  -bugprone-unchecked-optional-access,
+  -cppcoreguidelines-avoid-do-while,
+  -misc-include-cleaner,
+  -readability-redundant-member-init,
+
+#
+# Checks starting with a minus ('-') are ignored. All excluded checks are either or both covered
+# - manual by code reviews (mostly for design related issues)
+# - automatic by unit tests (mostly for bug related issues)
+#
+# Decisions for excluded checks:
+# * bugprone-reserved-identifier
+#   - Covered by readability-identifier-naming.
+# * clang-diagnostic-deprecated-volatile
+#   - Volatile is heavily used in C headers.
+# * clang-analyzer-*/clang-diagnostic-ignored-optimization-argument
+#   - The source code is finally compiled with GCC, which uses different compiler settings and flags.
+# * cppcoreguidelines-pro-type-reinterpret-cast
+#   - reinterpret cast is heavily used in embedded environment and is mostly the only options without introducing heavy
+#     abstraction overhead.
+# * cppcoreguidelines-avoid-magic-numbers/modernize-avoid-c-arrays
+#   - Covers to many simple cases (bit-masks, array sizes/access) which are normally understandable to the reader.
+#   - Suppressing them per case would decrease readability.
+# * modernize-use-trailing-return-type is not intended
+#   - The rule is a purely stylistic suggestion, which we decline.
+# * modernize-avoid-c-arrays
+#   - Covered by cppcoreguidelines-avoid-c-arrays.
+# * readability-identifier-length
+#   - Short variable names are often acceptable or domain specific (e.g. PID coefficients),
+#     and otherwise checked by reviews.
+# * misc-non-private-member-variables-in-classes
+#   - Aliased as cppcoreguidelines-non-private-member-variables-in-classes, which is still active. Disable this one for
+#     easier NOLINT-ing.
+# * bugprone-easily-swappable-parameters
+#   - POLARIS: We accept this.
+# * readability-function-cognitive-complexity
+#   - POLARIS: Comes from ST macros sometimes and is otherwise monitored in code reviews
+# * modernize-use-default-member-init/cppcoreguidelines-use-default-member-init/readability-redundant-member-init
+#   - POLARIS: Initialization inside translation unit is preferred if also other members are not default initialized
+# * cppcoreguidelines-avoid-const-or-ref-data-members
+#   - POLARIS: Heavily usage of static variables requires the usage of resources members
+# * bugprone-unchecked-optional-access
+#   - POLARIS: Produces crashes/hangs. Fixed in v18. See https://github.com/llvm/llvm-project/issues/59492.
+# * cppcoreguidelines-avoid-do-while
+#   - POLARIS: Do/while is a simple way to construct a "run at least once"-loop.
+# * misc-include-cleaner
+#   - POLARIS: Includes are nested types are sometimes hidden by internal/detail header which shouldn't be included directly.
+
+
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*.h(pp|xx)'
+
+# Same as in coding
+FormatStyle: file
+
+CheckOptions:
+  - { key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor,            value: 1 }
+  - { key: readability-identifier-naming.ClassCase,                                    value: lower_case }
+  - { key: readability-identifier-naming.ClassConstantCase,                            value: CamelCase } # static const in classes
+  - { key: readability-identifier-naming.ClassMemberCase,                              value: lower_case } # POLARIS
+  - { key: readability-identifier-naming.ClassMemberSuffix,                            value: '_' } # POLARIS
+  - { key: readability-identifier-naming.ConstantMemberCase,                           value: lower_case } # const in classes
+  - { key: readability-identifier-naming.ConstantMemberSuffix,                         value: '_' } # const in classes
+  - { key: readability-identifier-naming.ConstantParameterCase,                        value: lower_case }
+  - { key: readability-identifier-naming.ConstexprVariableCase,                        value: CamelCase }
+  - { key: readability-identifier-naming.EnumCase,                                     value: CamelCase }
+  - { key: readability-identifier-naming.EnumConstantCase,                             value: CamelCase }
+  - { key: readability-identifier-naming.GlobalConstantCase,                           value: CamelCase }
+  - { key: readability-identifier-naming.GlobalFunctionCase,                           value: lower_case }
+  - { key: readability-identifier-naming.GlobalVariableCase,                           value: lower_case }
+  - { key: readability-identifier-naming.LocalConstantCase,                            value: lower_case } # does not include const type* and const type&
+  - { key: readability-identifier-naming.LocalConstantPointerCase,                     value: lower_case } # POLARIS: means type const*, not const type*
+  - { key: readability-identifier-naming.LocalVariableCase,                            value: lower_case }
+  - { key: readability-identifier-naming.MemberCase,                                   value: lower_case }
+  - { key: readability-identifier-naming.MethodCase,                                   value: lower_case }
+  - { key: readability-identifier-naming.NamespaceCase,                                value: lower_case }
+  - { key: readability-identifier-naming.ParameterCase,                                value: lower_case }
+  - { key: readability-identifier-naming.PrivateMemberSuffix,                          value: '_' }
+  - { key: readability-identifier-naming.ProtectedMemberSuffix,                        value: '_' }
+  - { key: readability-identifier-naming.StaticConstantCase,                           value: CamelCase }
+  - { key: readability-identifier-naming.TemplateParameterCase,                        value: CamelCase }
+  - { key: readability-identifier-naming.TemplateTemplateParameterCase,                value: CamelCase }
+  - { key: readability-identifier-naming.TypeTemplateParameterCase,                    value: CamelCase }
+  - { key: readability-identifier-naming.TypeTemplateParameterIgnoredRegexp,           value: 'expr-type' }  # Workaround for bug https://github.com/llvm/llvm-project/issues/46097
+  - { key: readability-identifier-naming.TypedefCase,                                  value: lower_case }
+  - { key: readability-identifier-naming.UnionCase,                                    value: lower_case }
+

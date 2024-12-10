@@ -7,7 +7,8 @@ macro(setup_build_env COMPONENTS)
     if ($ENV{IDF_TARGET} IN_LIST valid_targets)
         idf_build_process($ENV{IDF_TARGET}
                 COMPONENTS ${COMPONENTS}
-                SDKCONFIG ${CMAKE_SOURCE_DIR}/sdkconfig
+                SDKCONFIG ${CMAKE_BINARY_DIR}/sdkconfig
+                SDKCONFIG_DEFAULTS ${CMAKE_SOURCE_DIR}/sdkconfig.defaults
                 BUILD_DIR ${CMAKE_BINARY_DIR}
         )
     else ()

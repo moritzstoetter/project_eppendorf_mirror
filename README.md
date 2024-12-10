@@ -10,20 +10,15 @@ podman build -t polaris_edf_idf_ci --build-arg BASE_IMAGE=docker.io/espressif/id
 
 ## Firmware
 
-Run the container by doing `./run_in_docker.sh` from the repos root. Then connect to via ssh with `ssh user@localhost -p2222`, finally in the container do:
-
-### Setup conan in container
+Start the container by doing `./start_container.sh` from the repos root. Then connect to via ssh with `ssh user@localhost -p2222` (password: _test_), finally in the container do:
 
 ```bash  
-conan user -r skynet -p
-```
-```bash
-conan user -r skynet-dev -p
-```
-```bash
-conan config set storage.path="${CONAN_STORAGE_PATH}"
+cmake --preset debug
+cmake --build --preset debug 
 ```
 
-### Build 
+or run the convenience script:
 
-Run `./do/sh`
+```bash 
+./do.sh
+```
