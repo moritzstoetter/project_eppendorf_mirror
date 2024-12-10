@@ -6,6 +6,9 @@
 #include "app/modules/sys/sys.hpp"
 #include "app/modules/wifi/wifi.hpp"
 
+#define SSID "<your-ssid>"sv
+#define PASS "<your-pass>"sv
+
 namespace detail {
 /**
  * @template concat
@@ -44,6 +47,8 @@ struct msg::decoder<request_t> {
       return wifi::requests::stop_service{};
     case 'd':
       return wifi::requests::start_scan{};
+    case 'e':
+      return wifi::requests::connect_to_ssid{SSID, PASS};
     default:
       return std::nullopt;
     }

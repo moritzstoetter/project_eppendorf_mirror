@@ -5,15 +5,14 @@
 #include <utility>
 
 namespace msg {
-inline constexpr auto always_match = [](auto&&) {
+constexpr auto always_match = [](auto&&) {
   return true;
 };
 
 namespace detail {
-template<typename T, typename P, typename F>
+template<typename T, std::predicate<T> P, std::invocable<T> F>
 struct callback {
-  constexpr auto operator()(const T& msg) const noexcept(noexcept(std::declval<F>()) and noexcept(std::declval<P>()))
-    -> bool {
+  constexpr bool operator()(const T& msg) const noexcept(noexcept(std::declval<F>()) and noexcept(std::declval<P>())) {
     if (pred(msg)) {
       action(msg);
       return true;
@@ -25,36 +24,37 @@ struct callback {
   [[no_unique_address]] mutable F action;
 };
 
-template<typename Msg>
+template<typename T>
 struct callback_construct_t {
-  template<std::invocable<Msg> P, std::invocable<Msg> F>
-    requires std::same_as<std::invoke_result_t<P, Msg>, bool>
+  template<std::predicate<T> P, std::invocable<T> F>
+    requires std::same_as<std::invoke_result_t<P, T>, bool>
   [[nodiscard]] constexpr auto operator()(P&& p, F&& f) const {
-    return callback<Msg, std::remove_cvref_t<P>, std::remove_cvref_t<F>>{std::forward<P>(p), std::forward<F>(f)};
+    return callback<T, std::remove_cvref_t<P>, std::remove_cvref_t<F>>{std::forward<P>(p), std::forward<F>(f)};
   }
 
-  template<std::invocable<Msg> F>
+  template<std::invocable<T> F>
   [[nodiscard]] constexpr auto operator()(F&& f) const {
-    return callback<Msg, decltype(always_match), std::remove_cvref_t<F>>{always_match, std::forward<F>(f)};
+    return callback<T, decltype(always_match), std::remove_cvref_t<F>>{always_match, std::forward<F>(f)};
   }
 };
 }    // namespace detail
 
-template<typename Msg>
-inline constexpr auto callback = detail::callback_construct_t<Msg>{};
+template<typename T>
+inline constexpr auto callback = detail::callback_construct_t<T>{};
 
 template<typename... Callbacks>
 struct handler {
   constexpr explicit handler(Callbacks&&... cbs) : callbacks_{std::forward_as_tuple(cbs...)} {}
 
   template<typename Msg>
-  constexpr auto operator()(const Msg& msg) const -> bool {
+  constexpr bool operator()(Msg&& msg) const {
     bool hndld = false;
     std::apply(
       [&msg, &hndld]<typename... Cbs>(Cbs&... cbs) {
         (..., [&] {
-          if constexpr (std::invocable<Cbs, Msg>)
-            hndld = cbs(msg) or hndld;
+          if constexpr (std::invocable<Cbs, Msg>) {
+            hndld = cbs(std::forward<Msg>(msg)) or hndld;
+          }
         }());
       },
       callbacks_);
