@@ -1,5 +1,5 @@
 /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*
+ *
  *  @date 2024-12-10 (created)
  *  @author Moritz Stötter (moritz@modernembedded.tech)
  *  @copyright (c) Eppendorf SE 2024 - Polaris Project
@@ -14,34 +14,11 @@
 
 #include "app/modules/sys/sys.hpp"
 #include "app/modules/wifi/wifi.hpp"
+#include "util/meta.hpp"
+#include "util/net.hpp"
 
-#define SSID "<put-your-data-here>"
-#define PASS "<put-your-data-here>"
-#define HOSTNAME "<put-your-data-here>"
 
-namespace detail {
-/**
- * @template concat
- * @brief Concatenates typenames
- */
-template<typename...>
-struct concat;
-
-template<typename... Args>
-using concat_t = typename concat<Args...>::type;
-
-template<template<typename...> class L, typename... Ts, typename... Us>
-struct concat<L<Ts...>, L<Us...>> {
-  using type = L<Ts..., Us...>;
-};
-
-template<typename L1, typename L2, typename... Rest>
-struct concat<L1, L2, Rest...> {
-  using type = concat_t<concat_t<L1, L2>, Rest...>;
-};
-}    // namespace detail
-
-using request_t = detail::concat_t<sys::request_t, wifi::request_t>;
+using request_t = meta::concat_t<sys::request_t, wifi::request_t>;
 
 template<>
 struct msg::decoder<request_t> {
@@ -61,6 +38,14 @@ struct msg::decoder<request_t> {
       return wifi::requests::connect_to_ssid{SSID, PASS};
     case 'g':
       return wifi::requests::set_hostname{HOSTNAME};
+    case 'h':
+      return wifi::requests::request_ip{};
+    case 'j':
+      return wifi::requests::request_ip{esp_netif_ip_info_t{
+        .ip = net::ipv4(192, 168, 178, 168),
+        .netmask = net::ipv4(255, 255, 255, 0),
+        .gw = net::ipv4(192, 168, 178, 1),
+      }};
     default:
       return std::nullopt;
     }

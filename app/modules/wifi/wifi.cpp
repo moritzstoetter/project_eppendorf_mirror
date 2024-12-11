@@ -11,13 +11,11 @@
 
 #include "esp_wps.h"
 
-#include "wifi_dbg.hpp"
-
 void wifi::mod::wifi_event_handler([[maybe_unused]] void* self,
                                    [[maybe_unused]] esp_event_base_t event_base,
                                    [[maybe_unused]] int32_t event_id,
                                    [[maybe_unused]] void* event_data) {
-  auto wifi = static_cast<mod*>(self);
+  auto *wifi = static_cast<mod*>(self);
 
   switch (event_id) {
   case WIFI_EVENT_WIFI_READY: {

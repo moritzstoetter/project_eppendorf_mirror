@@ -35,10 +35,7 @@ constexpr auto make_handler(mod&) {
                                    [](auto&&) {
                                      LOG_DEBUG("Dummy");
                                    }),
-    msg::callback<requests::unhandled>(msg::always_match,
-                                       [](auto&&) {
-                                         LOG_DEBUG("Unhandled");
-                                       }),
+    msg::callback<requests::unhandled>(msg::always_match, [](auto&&) {}),
   };
 }
 }    // namespace sys

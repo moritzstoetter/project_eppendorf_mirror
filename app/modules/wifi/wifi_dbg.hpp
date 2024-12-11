@@ -1,5 +1,5 @@
 /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*
+ *
  *  @date 2024-12-10 (created)
  *  @author Moritz Stötter (moritz@modernembedded.tech)
  *  @copyright (c) Eppendorf SE 2024 - Polaris Project
@@ -63,5 +63,42 @@ class emio::formatter<::wifi_ap_record_t> : public formatter<std::string_view> {
                      arg.primary,
                      arg.second,
                      arg.authmode);
+  }
+};
+
+template <typename T>
+class emio::formatter<std::optional<T>> {
+public:
+  constexpr result<void> parse(reader& format_rdr) noexcept {
+    return underlying_.parse(format_rdr);
+  }
+
+  constexpr result<void> format(writer& out, const std::optional<T>& arg) const noexcept {
+    if (!arg.has_value()) {
+      return out.write_str(detail::sv("none"));
+    } else {
+      EMIO_TRYV(out.write_str(detail::sv("optional(")));
+      EMIO_TRYV(underlying_.format(out, *arg));
+      return out.write_char(')');
+    }
+  }
+
+private:
+  formatter<T> underlying_;
+};
+
+template<>
+class emio::formatter<esp_ip4_addr> : public formatter<std::string_view> {
+public:
+  constexpr result<void> format(writer& out, const esp_ip4_addr& arg) const noexcept {
+    return format_to(out, "{}.{}.{}.{}", arg.addr >> 24 & 0xFF, arg.addr >> 16 & 0xFF, arg.addr >> 8 & 0xFF, arg.addr & 0xFF);
+  }
+};
+
+template<>
+class emio::formatter<esp_netif_ip_info_t> : public formatter<std::string_view> {
+  public:
+  constexpr result<void> format(writer& out, const esp_netif_ip_info_t& arg) const noexcept {
+    return format_to(out, "ip {}, netmask {}, gw {}", arg.ip, arg.netmask, arg.gw);
   }
 };

@@ -1,5 +1,5 @@
 /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*
+ *
  *  @date 2024-12-10 (created)
  *  @author Moritz Stötter (moritz@modernembedded.tech)
  *  @copyright (c) Eppendorf SE 2024 - Polaris Project
@@ -12,6 +12,7 @@
 #include <concepts>
 #include <tuple>
 #include <utility>
+#include <util/meta.hpp>
 
 namespace msg {
 constexpr auto always_match = [](auto&&) {
@@ -21,6 +22,9 @@ constexpr auto always_match = [](auto&&) {
 namespace detail {
 template<typename T, std::predicate<T> P, std::invocable<T> F>
 struct callback {
+  template<typename U>
+  constexpr static bool handles = std::same_as<T, U>;
+
   constexpr bool operator()(const T& msg) const noexcept(noexcept(std::declval<F>()) and noexcept(std::declval<P>())) {
     if (pred(msg)) {
       action(msg);
@@ -69,6 +73,12 @@ struct handler {
       callbacks_);
     return hndld;
   }
+
+  template<typename T>
+  constexpr static bool handles = (Callbacks::template handles<T> or ...);
+
+  template<typename... Ts>
+  constexpr static bool handles_all = (handles<Ts> and ...);
 
   private:
   std::tuple<Callbacks...> callbacks_;

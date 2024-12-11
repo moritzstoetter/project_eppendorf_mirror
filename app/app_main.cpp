@@ -37,6 +37,9 @@ extern "C" [[noreturn]] void app_main() {
     };
   // clang-format on
 
+  static_assert(decltype(MsgHandler)::handles<sys::requests::unhandled>);
+  static_assert(decltype(MsgHandler)::handles_all<request_t>);
+
   static auto messenger = messenger_t<request_t>{};
 
   while (true) {

@@ -17,12 +17,12 @@ add_executable(${APP}
         edf_stubs.cpp
 )
 
-add_subdirectory(modules)
-
 target_include_directories(${APP}
         PRIVATE
         ${CMAKE_SOURCE_DIR}
 )
+
+add_subdirectory(modules)
 
 target_link_libraries(${APP}
         PRIVATE
