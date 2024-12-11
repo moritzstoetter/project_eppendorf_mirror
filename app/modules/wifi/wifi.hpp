@@ -1,5 +1,5 @@
 /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*
+ *
  *  @date 2024-12-10 (created)
  *  @author Moritz Stötter (moritz@modernembedded.tech)
  *  @copyright (c) Eppendorf SE 2024 - Polaris Project
@@ -75,9 +75,18 @@ struct mod {
   }
 
   void connect(std::string_view ssid, std::string_view pass) const {
+    const auto copy_null_terminate =
+      []<std::ranges::input_range In, std::ranges::output_range<std::ranges::range_value_t<In>> Out>(In&& in,
+                                                                                                     Out&& out) {
+        auto [_, out_it] =
+          std::ranges::copy_n(std::begin(in), std::clamp(std::size(in), 0UZ, std::size(out) - 1), std::begin(out));
+        *out_it = '\0';
+      };
+
     auto conf = ::wifi_config_t{};
-    std::ranges::copy(ssid, std::begin(conf.sta.ssid));
-    std::ranges::copy(pass, std::begin(conf.sta.password));
+    copy_null_terminate(ssid, conf.sta.ssid);
+    copy_null_terminate(pass, conf.sta.password);
+
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &conf));
     ESP_ERROR_CHECK(esp_wifi_connect());
   }
@@ -104,8 +113,8 @@ struct mod {
   void deinit() {
     stop();
 
-    esp_wifi_deinit();
-    esp_netif_deinit();
+    ESP_ERROR_CHECK(esp_wifi_deinit());
+    ESP_ERROR_CHECK(esp_netif_deinit());
     esp_netif_destroy(netif_);
     netif_ = nullptr;
     state_ = state::uninitialized;
