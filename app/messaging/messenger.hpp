@@ -65,5 +65,5 @@ class messenger_t {
   }
 
   edf::os::static_queue<T, 10> out_queue_;
-  edf::os::static_thread<1'024 * 20> thread_;
+  edf::os::static_thread<1'024 * 10> thread_;
 };

@@ -15,4 +15,4 @@ struct decoder;
 
 template<typename T>
 constexpr auto decode = decoder<T>{};
-};
+}

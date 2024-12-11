@@ -11,10 +11,10 @@ setup_build_env(
 )
 
 set(APP ${PROJECT_NAME}_app)
+
 add_executable(${APP}
         app_main.cpp
         edf_stubs.cpp
-        modules/wifi/wifi_dbg.hpp
 )
 
 add_subdirectory(modules)
