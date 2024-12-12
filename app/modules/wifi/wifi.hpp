@@ -44,6 +44,7 @@ using request_t =
 // clang-format on
 
 class mod {
+  public:
   enum struct state { uninitialized, off, on, connected, got_ip };
 
   void start() {
