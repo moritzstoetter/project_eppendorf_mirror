@@ -1,3 +1,12 @@
+/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*
+ *  @date 2024-12-10 (created)
+ *  @author Moritz Stötter (moritz@modernembedded.tech)
+ *  @copyright (c) Eppendorf SE 2024 - Polaris Project
+ *  @brief Messenger service class.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 #pragma once
 
 #include <chrono>
@@ -10,6 +19,7 @@
 #include "bsp/time.hpp"
 #include "bsp/uart.hpp"
 
+template<typename T>
 class messenger_t {
   using msg_uart = uart<UART_NUM_1,
                         esp_uart_config_t{.config{
@@ -29,15 +39,15 @@ class messenger_t {
   public:
   messenger_t() :
     thread_{{"uart_msg_thd", edf::os::LowestTaskPriority}, [this] {
-              worker_();
+              worker();
             }} {
     if (not msg_uart::init()) {
       LOG_ERROR("Failed to init uart");
     }
   }
 
-  [[nodiscard]] std::optional<messages_t> receive(const std::chrono::milliseconds& timeout = os::forever) {
-    messages_t msg;
+  [[nodiscard]] std::optional<T> receive(const std::chrono::milliseconds& timeout = os::forever) {
+    T msg;
     return out_queue_.try_pop_for(msg, timeout) ? std::optional{msg} : std::nullopt;
   }
 
@@ -45,7 +55,7 @@ class messenger_t {
   [[noreturn]] void worker() {
     while (true) {
       const auto msg = msg_uart::rx().and_then([](auto raw) {
-        return decode<messages_t>(raw);
+        return msg::decode<T>(raw);
       });
 
       if (msg.has_value()) {
@@ -54,6 +64,6 @@ class messenger_t {
     }
   }
 
-  edf::os::static_queue<messages_t, 10> out_queue_;
+  edf::os::static_queue<T, 10> out_queue_;
   edf::os::static_thread<1'024 * 10> thread_;
 };

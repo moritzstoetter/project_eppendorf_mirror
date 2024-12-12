@@ -4,7 +4,7 @@
     {
       "name": "_general",
       "hidden": true,
-      "generator": "Ninja",
+      "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/_build/${presetName}",
       "cacheVariables": {
         "CMAKE_MODULE_PATH": "${sourceDir}/cmake",
