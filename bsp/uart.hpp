@@ -1,3 +1,12 @@
+/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*
+ *  @date 2024-12-10 (created)
+ *  @author Moritz Stötter (moritz@modernembedded.tech)
+ *  @copyright (c) Eppendorf SE 2024 - Polaris Project
+ *  @brief UART wrapper class.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 #pragma once
 
 #include "driver/gpio.h"
@@ -20,7 +29,7 @@ struct esp_uart_config_t {
 
 template<auto id, auto conf>
 struct uart {
-  static bool init() {
+  static bool init() noexcept {
     static_assert(conf.rx_buffer_size > UART_HW_FIFO_LEN(id));
 
     return ESP_OK == uart_driver_install(id, conf.rx_buffer_size, conf.tx_buffer_size, 0, nullptr, 0) and
@@ -29,13 +38,13 @@ struct uart {
   }
 
   template<std::ranges::contiguous_range R>
-  static void tx(const R& tx_payload) {
+  static void tx(const R& tx_payload) noexcept {
     uart_write_bytes(
       id, std::bit_cast<uint8_t*>(std::begin(tx_payload)), std::size(tx_payload) * sizeof(typename R::value_type));
   }
 
   [[nodiscard]] static std::optional<uint8_t>
-    rx(const std::chrono::milliseconds& timeout = os::forever) {
+    rx(const std::chrono::milliseconds& timeout = os::forever) noexcept {
     uint8_t buf;
     return uart_read_bytes(id, &buf, 1, os::to_ticks(timeout)) == 1 ? std::optional{buf} : std::nullopt;
   }
