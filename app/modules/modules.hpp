@@ -17,6 +17,10 @@
 #include "util/meta.hpp"
 #include "util/net.hpp"
 
+// todo: dont commit
+#define SSID "PumaNet"
+#define PASS "09699922550103412195"
+#define HOSTNAME "Discovery"
 
 using request_t = meta::concat_t<sys::request_t, wifi::request_t>;
 
