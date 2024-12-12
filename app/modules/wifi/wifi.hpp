@@ -93,7 +93,7 @@ class mod {
     ESP_ERROR_CHECK(esp_netif_dhcpc_start(netif_));
   }
 
-  void set_ip(esp_netif_ip_info_t const &ip_info) const {
+  void set_ip(const esp_netif_ip_info_t& ip_info) const {
     ESP_ERROR_CHECK(esp_netif_dhcpc_stop(netif_));
     ESP_ERROR_CHECK(esp_netif_set_ip_info(netif_, &ip_info));
   }
@@ -103,39 +103,16 @@ class mod {
   static void wifi_event_handler(void* self, esp_event_base_t event_base, int32_t event_id, void* event_data);
 
   void init() {
+    // esp netif
     ESP_ERROR_CHECK(esp_netif_init());
-
-    constexpr auto ip_conf = esp_netif_ip_info_t{};
-    const auto netif_inherent_conf = esp_netif_inherent_config{
-      .flags = static_cast<esp_netif_flags_t>(
-        // ESP_NETIF_DHCP_CLIENT |
-        ESP_NETIF_DEFAULT_ARP_FLAGS | ESP_NETIF_DEFAULT_MLDV6_REPORT_FLAGS | ESP_NETIF_FLAG_EVENT_IP_MODIFIED),
-      .mac = {},
-      .ip_info = &ip_conf,
-      .get_ip_event = IP_EVENT_STA_GOT_IP,
-      .lost_ip_event = IP_EVENT_STA_LOST_IP,
-      .if_key = "wifi_sta",
-      .if_desc = "wifi_sta",
-      .route_prio = 100,
-      .bridge_info = nullptr};
-    // constexpr auto netif_conf = esp_netif_config_t{
-    //   .base = &netif_inherent_conf,
-    //   .driver = nullptr,
-    //   .stack = ESP_NETIF_NETSTACK_DEFAULT_WIFI_STA,
-    // };
-    // esp_netif_config_t netif_conf = ESP_NETIF_DEFAULT_WIFI_STA();
-    // netif_ = esp_netif_new(&netif_conf);
-
-    netif_ = esp_netif_create_wifi(WIFI_IF_STA, &netif_inherent_conf);
+    netif_ = esp_netif_create_wifi(WIFI_IF_STA, &default_netif_inherent_conf);
     ESP_ERROR_CHECK(esp_wifi_set_default_wifi_sta_handlers());
-
-    // netif_ = esp_netif_create_default_wifi_sta();
     assert(netif_);
     ESP_ERROR_CHECK(esp_netif_attach_wifi_station(netif_));
 
+    // esp wifi driver
     const ::wifi_init_config_t init_cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&init_cfg));
-
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
 
     state_ = state::off;
@@ -151,6 +128,19 @@ class mod {
     netif_ = nullptr;
     state_ = state::uninitialized;
   }
+
+  constexpr static auto default_ip_conf = esp_netif_ip_info_t{};
+  constexpr static auto default_netif_inherent_conf = esp_netif_inherent_config{
+    .flags = static_cast<esp_netif_flags_t>(ESP_NETIF_DEFAULT_ARP_FLAGS | ESP_NETIF_DEFAULT_MLDV6_REPORT_FLAGS |
+                                            ESP_NETIF_FLAG_EVENT_IP_MODIFIED),
+    .mac = {},
+    .ip_info = &default_ip_conf,
+    .get_ip_event = IP_EVENT_STA_GOT_IP,
+    .lost_ip_event = IP_EVENT_STA_LOST_IP,
+    .if_key = "wifi_sta",
+    .if_desc = "wifi_sta",
+    .route_prio = 100,
+    .bridge_info = nullptr};
 
   state state_ = state::uninitialized;
   esp_netif_t* netif_ = nullptr;

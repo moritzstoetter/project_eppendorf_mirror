@@ -17,10 +17,12 @@
 #include "util/meta.hpp"
 #include "util/net.hpp"
 
-// todo: dont commit
-#define SSID "PumaNet"
-#define PASS "09699922550103412195"
-#define HOSTNAME "Discovery"
+constexpr std::string_view SSID = "<put-your-data-here>";
+constexpr std::string_view PASS = "<put-your-data-here>";
+constexpr std::string_view HOSTNAME = "<put-your-data-here>";
+constexpr auto IP = net::ipv4(192, 168, 0, 2);
+constexpr auto NETMASK = net::ipv4(255, 255, 255, 0);
+constexpr auto GW = net::ipv4(192, 168, 0, 1);
 
 using request_t = meta::concat_t<sys::request_t, wifi::request_t>;
 
@@ -30,8 +32,6 @@ struct msg::decoder<request_t> {
     switch (byte) {
     case 'q':
       return sys::requests::dummy{};
-    case 'w':
-      return sys::requests::unhandled{};
     case 'a':
       return wifi::requests::start_service{};
     case 's':
@@ -46,9 +46,9 @@ struct msg::decoder<request_t> {
       return wifi::requests::request_ip{};
     case 'j':
       return wifi::requests::request_ip{esp_netif_ip_info_t{
-        .ip = net::ipv4(192, 168, 178, 168),
-        .netmask = net::ipv4(255, 255, 255, 0),
-        .gw = net::ipv4(192, 168, 178, 1),
+        .ip = IP,
+        .netmask = NETMASK,
+        .gw = GW,
       }};
     default:
       return std::nullopt;

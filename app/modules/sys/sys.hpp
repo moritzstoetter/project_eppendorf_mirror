@@ -22,7 +22,10 @@ struct dummy {
 struct unhandled {};
 }    // namespace requests
 
-using request_t = std::variant<requests::dummy, requests::unhandled>;
+using request_t = std::variant<
+    requests::dummy
+    //, requests::unhandled // <- will cause a compilation error due to static_assert in app_main
+>;
 
 // module
 struct mod {
@@ -35,7 +38,6 @@ constexpr auto make_handler(mod&) {
                                    [](auto&&) {
                                      LOG_DEBUG("Dummy");
                                    }),
-    msg::callback<requests::unhandled>(msg::always_match, [](auto&&) {}),
   };
 }
 }    // namespace sys

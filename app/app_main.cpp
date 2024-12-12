@@ -1,5 +1,5 @@
 /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*
+ *
  *  @date 2024-12-10 (created)
  *  @author Moritz Stötter (moritz@modernembedded.tech)
  *  @copyright (c) Eppendorf SE 2024 - Polaris Project
@@ -37,8 +37,8 @@ extern "C" [[noreturn]] void app_main() {
     };
   // clang-format on
 
-  static_assert(decltype(MsgHandler)::handles<sys::requests::unhandled>);
-  static_assert(decltype(MsgHandler)::handles_all<request_t>);
+  // make unhandled messages a compilation error
+  static_assert(meta::all_of<request_t, decltype(MsgHandler)::handles>);
 
   static auto messenger = messenger_t<request_t>{};
 
@@ -50,6 +50,7 @@ extern "C" [[noreturn]] void app_main() {
         },
         *msg);
       if (not dispatched) {
+        // for illustration purposes since with the static_assert above this can not happen
         LOG_WARNING("Received unhandled message");
       }
     }

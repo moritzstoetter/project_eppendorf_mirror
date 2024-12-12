@@ -14,6 +14,7 @@ class Polaris(ConanFile):
         "freeRTOS/10.5.1-beta.1@polaris/esp",
         "edf/4.9.0-beta.2@polaris/esp",
         "polaris_shared/0.0.1-beta.1@polaris/esp",
+        "emio/0.8.0",
     )
     generators = "cmake", "EdfCMakeToolchainGenerator"
     exports_sources = None

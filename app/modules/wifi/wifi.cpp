@@ -50,7 +50,7 @@ void wifi::mod::wifi_event_handler(void* self,
     LOG_DEBUG("WIFI_EVENT_STA_WPS_ER_SUCCESS");
     ESP_ERROR_CHECK(esp_wifi_wps_disable());
     if (event_data != nullptr) {
-      const auto* evt = static_cast<wifi_event_sta_wps_er_success_t*>(event_data);
+      const auto* evt = static_cast<::wifi_event_sta_wps_er_success_t*>(event_data);
       wifi->connect(reinterpret_cast<const char*>(&evt->ap_cred[0].ssid[0]),
                     reinterpret_cast<const char*>(&evt->ap_cred[0].passphrase[0]));
     }

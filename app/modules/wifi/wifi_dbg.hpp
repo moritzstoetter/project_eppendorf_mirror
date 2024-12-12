@@ -66,27 +66,6 @@ class emio::formatter<::wifi_ap_record_t> : public formatter<std::string_view> {
   }
 };
 
-template <typename T>
-class emio::formatter<std::optional<T>> {
-public:
-  constexpr result<void> parse(reader& format_rdr) noexcept {
-    return underlying_.parse(format_rdr);
-  }
-
-  constexpr result<void> format(writer& out, const std::optional<T>& arg) const noexcept {
-    if (!arg.has_value()) {
-      return out.write_str(detail::sv("none"));
-    } else {
-      EMIO_TRYV(out.write_str(detail::sv("optional(")));
-      EMIO_TRYV(underlying_.format(out, *arg));
-      return out.write_char(')');
-    }
-  }
-
-private:
-  formatter<T> underlying_;
-};
-
 template<>
 class emio::formatter<esp_ip4_addr> : public formatter<std::string_view> {
 public:

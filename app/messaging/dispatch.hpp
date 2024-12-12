@@ -12,7 +12,6 @@
 #include <concepts>
 #include <tuple>
 #include <utility>
-#include <util/meta.hpp>
 
 namespace msg {
 constexpr auto always_match = [](auto&&) {
@@ -23,7 +22,9 @@ namespace detail {
 template<typename T, std::predicate<T> P, std::invocable<T> F>
 struct callback {
   template<typename U>
-  constexpr static bool handles = std::same_as<T, U>;
+  struct handles {
+    constexpr static bool value = std::same_as<T, U>;
+  };
 
   constexpr bool operator()(const T& msg) const noexcept(noexcept(std::declval<F>()) and noexcept(std::declval<P>())) {
     if (pred(msg)) {
@@ -75,10 +76,9 @@ struct handler {
   }
 
   template<typename T>
-  constexpr static bool handles = (Callbacks::template handles<T> or ...);
-
-  template<typename... Ts>
-  constexpr static bool handles_all = (handles<Ts> and ...);
+  struct handles {
+    constexpr static bool value = (Callbacks::template handles<T>::value or ...);
+  };
 
   private:
   std::tuple<Callbacks...> callbacks_;
