@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.22)
-
 include(esp32)
 
 setup_build_env(
@@ -15,6 +13,7 @@ set(APP ${PROJECT_NAME}_app)
 add_executable(${APP}
         app_main.cpp
         edf_stubs.cpp
+        ../util/string.hpp
 )
 
 target_include_directories(${APP}

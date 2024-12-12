@@ -1,5 +1,5 @@
 /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*
+ *
  *  @date 2024-12-10 (created)
  *  @author Moritz Stötter (moritz@modernembedded.tech)
  *  @copyright (c) Eppendorf SE 2024 - Polaris Project
@@ -11,11 +11,11 @@
 
 #include "esp_wps.h"
 
-void wifi::mod::wifi_event_handler([[maybe_unused]] void* self,
+void wifi::mod::wifi_event_handler(void* self,
                                    [[maybe_unused]] esp_event_base_t event_base,
-                                   [[maybe_unused]] int32_t event_id,
-                                   [[maybe_unused]] void* event_data) {
-  auto *wifi = static_cast<mod*>(self);
+                                   int32_t event_id,
+                                   void* event_data) {
+  auto* wifi = static_cast<mod*>(self);
 
   switch (event_id) {
   case WIFI_EVENT_WIFI_READY: {
@@ -173,7 +173,7 @@ void wifi::mod::ip_event_handler([[maybe_unused]] void* self,
                                  [[maybe_unused]] esp_event_base_t event_base,
                                  [[maybe_unused]] int32_t event_id,
                                  [[maybe_unused]] void* event_data) {
-  auto * wifi = static_cast<mod*>(self);
+  auto* wifi = static_cast<mod*>(self);
 
   switch (event_id) {
   case IP_EVENT_STA_GOT_IP: {

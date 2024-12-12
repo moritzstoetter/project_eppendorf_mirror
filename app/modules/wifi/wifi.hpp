@@ -16,6 +16,7 @@
 
 #include "app/log_config.hpp"
 #include "app/messaging/dispatch.hpp"
+#include "util/string.hpp"
 #include "app/modules/wifi/wifi_dbg.hpp"
 
 namespace wifi {
@@ -48,7 +49,8 @@ using request_t =
 >;
 // clang-format on
 
-struct mod {
+class mod {
+  public:
   enum struct state { uninitialized, off, on, connected, got_ip };
 
   void start() {
@@ -75,24 +77,14 @@ struct mod {
 
   void set_hostname(std::string_view hostname) const {
     std::array<char, 32> buf{};
-    const auto out = std::copy_n(hostname.begin(), std::clamp(hostname.size(), 0UZ, 31UZ), buf.begin());
-    *out = '\0';
+    string::copy_null_terminate(hostname, buf);
     ESP_ERROR_CHECK(esp_netif_set_hostname(netif_, buf.data()));
   }
 
   void connect(std::string_view ssid, std::string_view pass) const {
-    const auto copy_null_terminate =
-      []<std::ranges::input_range In, std::ranges::output_range<std::ranges::range_value_t<In>> Out>(In&& in,
-                                                                                                     Out&& out) {
-        auto [_, out_it] =
-          std::ranges::copy_n(std::begin(in), std::clamp(std::size(in), 0UZ, std::size(out) - 1), std::begin(out));
-        *out_it = '\0';
-      };
-
     auto conf = ::wifi_config_t{};
-    copy_null_terminate(ssid, conf.sta.ssid);
-    copy_null_terminate(pass, conf.sta.password);
-
+    string::copy_null_terminate(ssid, conf.sta.ssid);
+    string::copy_null_terminate(pass, conf.sta.password);
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &conf));
     ESP_ERROR_CHECK(esp_wifi_connect());
   }
@@ -107,10 +99,8 @@ struct mod {
   }
 
   private:
-  state state_ = state::uninitialized;
-  esp_netif_t* netif_ = nullptr;
-  esp_event_handler_instance_t ip_event_handler_instance_ = nullptr;
-  esp_event_handler_instance_t wifi_event_handler_instance_ = nullptr;
+  static void ip_event_handler(void* self, esp_event_base_t event_base, int32_t event_id, void* event_data);
+  static void wifi_event_handler(void* self, esp_event_base_t event_base, int32_t event_id, void* event_data);
 
   void init() {
     ESP_ERROR_CHECK(esp_netif_init());
@@ -162,8 +152,10 @@ struct mod {
     state_ = state::uninitialized;
   }
 
-  static void ip_event_handler(void* self, esp_event_base_t event_base, int32_t event_id, void* event_data);
-  static void wifi_event_handler(void* self, esp_event_base_t event_base, int32_t event_id, void* event_data);
+  state state_ = state::uninitialized;
+  esp_netif_t* netif_ = nullptr;
+  esp_event_handler_instance_t ip_event_handler_instance_ = nullptr;
+  esp_event_handler_instance_t wifi_event_handler_instance_ = nullptr;
 };
 
 constexpr auto make_handler(mod& wifi) {
