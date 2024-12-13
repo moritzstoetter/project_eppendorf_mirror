@@ -26,7 +26,7 @@ struct callback {
     constexpr static bool value = std::same_as<T, U>;
   };
 
-  constexpr bool operator()(const T& msg) const noexcept(noexcept(std::declval<F>()) and noexcept(std::declval<P>())) {
+  constexpr bool operator()(const T& msg) const noexcept(noexcept(std::declval<F>()) && noexcept(std::declval<P>())) {
     if (pred(msg)) {
       action(msg);
       return true;
@@ -67,7 +67,7 @@ struct handler {
       [&msg, &hndld]<typename... Cbs>(Cbs&... cbs) {
         (..., [&] {
           if constexpr (std::invocable<Cbs, Msg>) {
-            hndld = cbs(std::forward<Msg>(msg)) or hndld;
+            hndld = cbs(std::forward<Msg>(msg)) || hndld;
           }
         }());
       },
@@ -77,7 +77,7 @@ struct handler {
 
   template<typename T>
   struct handles {
-    constexpr static bool value = (Callbacks::template handles<T>::value or ...);
+    constexpr static bool value = (Callbacks::template handles<T>::value || ...);
   };
 
   private:

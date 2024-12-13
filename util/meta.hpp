@@ -46,7 +46,7 @@ struct is_all_of<L<T>, Pred> {
 
 template <template <typename...> class L, typename T, typename... Ts, template <typename> class Pred>
 struct is_all_of<L<T, Ts...>, Pred> {
-  constexpr static bool value = Pred<T>::value and is_all_of<L<Ts...>, Pred>::value;
+  constexpr static bool value = Pred<T>::value && is_all_of<L<Ts...>, Pred>::value;
 };
 } // namespace detail
 

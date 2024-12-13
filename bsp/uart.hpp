@@ -32,8 +32,8 @@ struct uart {
   static bool init() noexcept {
     static_assert(conf.rx_buffer_size > UART_HW_FIFO_LEN(id));
 
-    return ESP_OK == uart_driver_install(id, conf.rx_buffer_size, conf.tx_buffer_size, 0, nullptr, 0) and
-           ESP_OK == uart_param_config(id, &conf.config) and
+    return ESP_OK == uart_driver_install(id, conf.rx_buffer_size, conf.tx_buffer_size, 0, nullptr, 0) &&
+           ESP_OK == uart_param_config(id, &conf.config) &&
            ESP_OK == uart_set_pin(id, conf.pins.tx, conf.pins.rx, conf.pins.rts, conf.pins.cts);
   }
 
