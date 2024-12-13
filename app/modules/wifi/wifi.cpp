@@ -11,6 +11,78 @@
 
 #include "esp_wps.h"
 
+void wifi::mod::start() {
+  if (state_ != state::uninitialized) {
+    deinit();
+  }
+  init();
+
+  ESP_ERROR_CHECK(esp_event_handler_instance_register(
+    WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, this, &wifi_event_handler_instance_));
+  ESP_ERROR_CHECK(esp_event_handler_instance_register(
+    IP_EVENT, ESP_EVENT_ANY_ID, &ip_event_handler, this, &ip_event_handler_instance_));
+
+  ESP_ERROR_CHECK(esp_wifi_start());
+  state_ = state::on;
+}
+
+void wifi::mod::stop() {
+  ESP_ERROR_CHECK(esp_wifi_stop());
+  ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT, ESP_EVENT_ANY_ID, &ip_event_handler_instance_));
+  ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler_instance_));
+  state_ = state::off;
+}
+
+void wifi::mod::set_hostname(std::string_view hostname) const {
+  std::array<char, 32> buf{};
+  string::copy_null_terminate(hostname, buf);
+  ESP_ERROR_CHECK(esp_netif_set_hostname(netif_, buf.data()));
+}
+
+void wifi::mod::connect(std::string_view ssid, std::string_view pass) const {
+  auto conf = ::wifi_config_t{};
+  string::copy_null_terminate(ssid, conf.sta.ssid);
+  string::copy_null_terminate(pass, conf.sta.password);
+  ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &conf));
+  ESP_ERROR_CHECK(esp_wifi_connect());
+}
+
+void wifi::mod::start_dhcp() const {
+  ESP_ERROR_CHECK(esp_netif_dhcpc_start(netif_));
+}
+
+void wifi::mod::set_ip(const esp_netif_ip_info_t& ip_info) const {
+  ESP_ERROR_CHECK(esp_netif_dhcpc_stop(netif_));
+  ESP_ERROR_CHECK(esp_netif_set_ip_info(netif_, &ip_info));
+}
+
+void wifi::mod::init() {
+  // esp netif
+  ESP_ERROR_CHECK(esp_netif_init());
+  netif_ = esp_netif_create_wifi(WIFI_IF_STA, &default_netif_inherent_conf);
+  ESP_ERROR_CHECK(esp_wifi_set_default_wifi_sta_handlers());
+  assert(netif_);
+  ESP_ERROR_CHECK(esp_netif_attach_wifi_station(netif_));
+
+  // esp wifi driver
+  const ::wifi_init_config_t init_cfg = WIFI_INIT_CONFIG_DEFAULT();
+  ESP_ERROR_CHECK(esp_wifi_init(&init_cfg));
+  ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+
+  state_ = state::off;
+}
+
+void wifi::mod::deinit() {
+  stop();
+
+  ESP_ERROR_CHECK(esp_wifi_deinit());
+  esp_netif_deinit();    // not checking the error because this call is not supported yet, and therefore returns
+  // ESP_ERR_NOT_SUPPORTED
+  esp_netif_destroy(netif_);
+  netif_ = nullptr;
+  state_ = state::uninitialized;
+}
+
 void wifi::mod::wifi_event_handler(void* self,
                                    [[maybe_unused]] esp_event_base_t event_base,
                                    int32_t event_id,
